@@ -1,31 +1,78 @@
 import numpy as np
-from scipy.linalg import eig
-def lda(X, y):
-  """
-  Performs Linear Discriminant Analysis (LDA)
-  Args:
-    X: Data matrix (n_samples, n_features)
-    y: Target labels (n_samples,)
-  Returns:
-    X_lda: Projected data (n_samples, n_components)
-  """
-  classes = np.unique(y)
-  mean_overall = np.mean(X, axis=0)
-  mean_vectors = []
-  for c in classes:
-    mean_vectors.append(np.mean(X[y==c], axis=0))
-  mean_vectors = np.array(mean_vectors)
-  S_W = np.zeros((X.shape[1], X.shape[1]))
-  S_B = np.zeros((X.shape[1], X.shape[1]))
-  for i, mean_vec in enumerate(mean_vectors):
-    class_i = X[y==classes[i]]
-    S_W += (class_i - mean_vec).T @ (class_i - mean_vec)
-    n = class_i.shape[0]
-    mean_diff = mean_vec - mean_overall
-    S_B += n * (mean_diff).reshape(-1, 1) @ (mean_diff).reshape(1, -1)
-  eigenvalues, eigenvectors = eig(S_B, S_W)
-  idx = eigenvalues.argsort()[::-1]
-  eigenvalues = eigenvalues[idx]
-  eigenvectors = eigenvectors[:, idx]
-  X_lda = X @ eigenvectors
-  return X_lda
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_wine
+from sklearn.preprocessing import StandardScaler
+
+# Load the Wine dataset
+wine = load_wine()
+X = wine.data
+y = wine.target
+
+# Number of classes and features
+num_classes = len(np.unique(y))
+num_features = X.shape[1]
+
+print("Number of classes:", num_classes)
+print("Number of features:", num_features)
+
+# Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Calculate the mean of each class
+means = [np.mean(X_scaled[y == i], axis=0) for i in range(num_classes)]
+
+# Calculate the overall mean
+overall_mean = np.mean(X_scaled, axis=0)
+
+# Step 1: Calculate the between-class variance
+S_B = np.zeros((num_features, num_features))
+for i in range(num_classes):
+    n_i = X_scaled[y == i].shape[0]  # number of samples in class i
+    mean_i = means[i].reshape(num_features, 1)  # class mean reshaped
+    overall_mean_reshaped = overall_mean.reshape(num_features, 1)  # overall mean reshaped
+    S_B += n_i * (mean_i - overall_mean_reshaped).dot((mean_i - overall_mean_reshaped).T)
+
+# Step 2: Calculate the within-class variance
+S_W = np.zeros((num_features, num_features))
+for i in range(num_classes):
+    class_scatter = np.cov(X_scaled[y == i].T)  # covariance of class i
+    S_W += class_scatter
+
+# Step 3: Compute eigenvectors and eigenvalues
+eig_vals, eig_vecs = np.linalg.eig(np.linalg.inv(S_W).dot(S_B))
+
+# Taking only the real parts
+eig_vals = np.real(eig_vals)
+eig_vecs = np.real(eig_vecs)
+
+# Step 4: Sort the eigenvalues and their corresponding eigenvectors
+sorted_indices = np.argsort(eig_vals)[::-1]  # indices of sorted eigenvalues
+eig_vals = eig_vals[sorted_indices]
+eig_vecs = eig_vecs[:, sorted_indices]
+
+# Selecting the top k eigenvalues and eigenvectors
+k = num_classes - 1  # We typically choose k = number of classes - 1
+W = eig_vecs[:, :k]
+
+# Step 5: Transform the data
+X_lda = X_scaled.dot(W)
+
+# Variance Ratio
+variance_ratio = eig_vals / np.sum(eig_vals)
+print("Variance Ratio:")
+print(variance_ratio[:k])
+
+# LDA Scatter Plot
+plt.figure(figsize=(8, 6))
+for i in range(num_classes):
+    plt.scatter(X_lda[y == i, 0], X_lda[y == i, 1], label=f'Class {i}')
+plt.title('LDA Scatter Plot')
+plt.xlabel('LD1')
+plt.ylabel('LD2')
+plt.legend()
+plt.grid()
+plt.show()
+
+
