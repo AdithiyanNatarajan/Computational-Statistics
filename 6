@@ -1,9 +1,87 @@
-import numpy as np
-data = np.array([1, 2, 3, 4, 5])
-print("Sum:", np.sum(data))
-print("Mean:", np.mean(data))
-print("Median:", np.median(data))
-print("Min:", np.min(data))
-print("Max:", np.max(data))
-print("Standard Deviation:", np.std(data))
-print("Variance:", np.var(data))
+mport pandas as pd
+
+# Sample 1D data
+data_1d = pd.Series([0.374540, 0.950714, 0.731994, 0.598658, 0.156019])
+
+# Aggregation for 1D data
+agg_1d = {
+    'Sum': data_1d.sum(),
+    'Mean': data_1d.mean(),
+    'Count': data_1d.count(),
+    'Minimum': data_1d.min(),
+    'Maximum': data_1d.max()
+}
+
+print("Aggregation of 1D")
+for key, value in agg_1d.items():
+    print(f"{key} = {value}")
+
+# Sample 2D data
+data_2d = pd.DataFrame({
+    'A': [0.183405, 0.304242, 0.524756, 0.431945, 0.291229],
+    'B': [0.611853, 0.139494, 0.292145, 0.366362, 0.456070]
+})
+
+# Aggregation (Columnwise)
+agg_2d_col = {
+    'Sum': data_2d.sum(),
+    'Mean': data_2d.mean(),
+    'Count': data_2d.count(),
+    'Minimum': data_2d.min(),
+    'Maximum': data_2d.max()
+}
+
+# Aggregation (Rowwise)
+agg_2d_row_sum = data_2d.sum(axis=1)
+
+print("\nAggregation of 2D")
+print("Sum (Columnwise)")
+for key, value in agg_2d_col['Sum'].items():
+    print(f"{key} {value}")
+
+print("\nSum (Rowwise)")
+for index, value in agg_2d_row_sum.items():
+    print(f"{index} {value}")
+
+print("\nMean")
+for key, value in agg_2d_col['Mean'].items():
+    print(f"{key} {value}")
+
+print("\nCount")
+print(data_2d.count())
+
+print("\nMinimum")
+for key, value in agg_2d_col['Minimum'].items():
+    print(f"{key} {value}")
+
+print("\nMaximum")
+for key, value in agg_2d_col['Maximum'].items():
+    print(f"{key} {value}")
+
+# Placeholder for the Planet dataset
+data_nd = pd.DataFrame({
+    'Method': ['A', 'A', 'B', 'B', 'C'],
+    'orbital Period': [10, 20, 10, 20, 30],
+    'year': [2000, 2001, 2002, 2003, 2004]
+})
+
+# Group by 'Method' and 'orbital Period'
+grouped_data = data_nd.groupby(['Method', 'orbital Period'])
+
+# Aggregation for n-D data
+agg_nd_shape = grouped_data.size()
+agg_nd_stats = grouped_data['year'].agg(['mean', 'std', 'var'])
+agg_nd_std = grouped_data['year'].std()
+
+print("\nAggregation of n-D data.")
+print("Group by 'Method' and 'orbital Period'\n")
+
+print("Shape or Size")
+print(agg_nd_shape)
+
+print("\nStatistical values based on 'Method' and 'year'")
+print(agg_nd_stats)
+
+print("\nStandard Deviation based on 'Method'")
+print(agg_nd_std)
+
