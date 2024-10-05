@@ -1,8 +1,30 @@
 import matplotlib.pyplot as plt
-import numpy as np
-data = np.random.randn(1000)
-plt.hist(data, bins=30, density=True)
-plt.xlabel('Value')
-plt.ylabel('Density')
-plt.title('Histogram')
+
+# Sample Input Data
+product = ['computer', 'monitor', 'laptop', 'printer', 'tablet']
+quantity = [320, 450, 300, 120, 280]
+
+# Step 1: Prepare the data
+# Data is already prepared in the product and quantity lists
+
+# Step 2: Create a Vertical Bar Plot
+plt.figure(figsize=(12, 6))
+
+# Vertical Bar Plot
+plt.subplot(1, 2, 1)  # (rows, columns, panel number)
+plt.bar(product, quantity, color='skyblue')
+plt.title('Vertical Bar Plot')
+plt.xlabel('Products')
+plt.ylabel('Quantity')
+plt.xticks(rotation=45)
+
+# Step 3: Create a Horizontal Bar Plot
+plt.subplot(1, 2, 2)  # (rows, columns, panel number)
+plt.barh(product, quantity, color='salmon')
+plt.title('Horizontal Bar Plot (H-Plot)')
+plt.xlabel('Quantity')
+plt.ylabel('Products')
+
+# Show the plots
+plt.tight_layout()
 plt.show()
