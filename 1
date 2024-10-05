@@ -1,18 +1,26 @@
+import plotly.express as px
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import skew, kurtosis
-iris sns.load_dataset('iris')
-attribute = 'sepal_length' # You can change this to any attribute
-print(iris.head())
-sns.histplot(iris [attribute], kde=True)
-plt.title(f'Histogram and KDE of attribute}')
+from scipy import stats
+import numpy as np
+df = px.data.iris()
+attribute = 'sepal_length'
+print("First five records of the selected attribute:")
+print(df[[attribute]].head())
+plt.figure(figsize=(10, 6))
+sns.histplot(df[attribute], kde=True)
+plt.title(f'Histogram and KDE of {attribute}')
+plt.xlabel(attribute)
+plt.ylabel('Frequency')
 plt.show()
-mean iris [attribute].mean()
-std iris [attribute].std()
-x = range(int(iris [attribute).min()), int (iris [attribute].max()) + 1)
-y = [1/(std (2*np.pi)**0.5) * np.exp(-0.5*((i-mean)/std)**2) for i in x]
-plt.plot(x, y)
-plt.title(f'Probability Distribution of {attribute}')
-print(f'Skewness of {attribute}:', skew(iris [attribute]))
-print(f'Kurtosis of {attribute}:', kurtosis (iris [attribute])
+plt.figure(figsize=(10, 6))
+stats.probplot(df[attribute], dist="norm", plot=plt)
+plt.title(f'Probability Plot of {attribute}')
+plt.show()
+skewness = df[attribute].skew()
+print(f'Skewness for {attribute} = {skewness}')
+kurtosis = df[attribute].kurtosis()
+print(f'Kurtosis for {attribute} = {kurtosis}')
+
+
